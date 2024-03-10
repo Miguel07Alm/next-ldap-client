@@ -153,45 +153,51 @@ export async function isCookieValid(){
 }
 
 export async function createUser({name, username, password}: IRegisterInfo){
+    function getRandomIntInclusive(min: number, max: number) {
+        min = Math.ceil(min); // Asegura que min sea el siguiente entero más grande si no es un entero
+        max = Math.floor(max); // Asegura que max sea el mayor entero menor o igual a max
+        return Math.floor(Math.random() * (max - min + 1)) + min; //El máximo es inclusivo y el mínimo es inclusivo
+    }
+
     try {
         username = username.trim().toLowerCase();
         const isTaken = await usernameExists(username);
         if(isTaken) return false;
-        const uuid = Math.random() * 1000000;
-        const accountInfo = `dn: cn=${username},ou=Personal,dc=ldapmss245,dc=eastus,dc=cloudapp,dc=azure,dc=com\
-objectClass: top\
-objectClass: account\
-objectClass: posixAccount\
-objectClass: shadowAccount\
-cn: ${username}\
-uid: ${username}\
-uidNumber: ${uuid}\
-gidNumber: ${uuid}\
-homeDirectory: /home/${username}\
-userPassword: ${password}\
-loginShell: /bin/bash\
-        `;
+        const uuid = getRandomIntInclusive(1, 1000000);
+        const accountInfo = `dn: cn=${username},ou=Personal,dc=ldapmss245,dc=eastus,dc=cloudapp,dc=azure,dc=com\n` +
+        `objectClass: top\n` +
+        `objectClass: account\n` +
+        `objectClass: posixAccount\n` +
+        `objectClass: shadowAccount\n` +
+        `cn: ${username}\n` +
+        `uid: ${username}\n` +
+        `uidNumber: ${uuid}\n` +
+        `gidNumber: ${uuid}\n` +
+        `homeDirectory: /home/${username}\n` +
+        `userPassword: ${password}\n` +
+        `loginShell: /bin/bash\n`;
         
         fs.writeFile(`/etc/ldap/${username}.ldif`, accountInfo, (err) => {
             if (err) {
               console.error('Error al crear el archivo:', err);
-              return;
+                return false;
             }
           });   
+          exec(`ldapadd -c -x -D "cn=admin,dc=ldapmss245,dc=eastus,dc=cloudapp,dc=azure,dc=com" -w '${process.env.LDAP_PASSWORD}' -f /etc/ldap/${username}.ldif
+          `, (error, stdout, stderr) => {
+              if (error) {
+                  console.error(
+                      `Error ejecutando el comando: ${error.message}`
+                  );
+                  return false;
+              }
+              if (stderr) {
+                  console.error(`Error en el comando: ${stderr}`);
+                  return false;
+              }
+          });
             setCookie(username);
-            exec(`ldapadd -c -x -D "cn=admin,dc=ldapmss245,dc=eastus,dc=cloudapp,dc=azure,dc=com" -w '${process.env.LDAP_PASSWORD}' -f ${username}.ldif
-            `, (error, stdout, stderr) => {
-                if (error) {
-                    console.error(
-                        `Error ejecutando el comando: ${error.message}`
-                    );
-                    return false;
-                }
-                if (stderr) {
-                    console.error(`Error en el comando: ${stderr}`);
-                    return false;
-                }
-            });
+           
           return true;
     } catch(error) {
         console.error(error);
