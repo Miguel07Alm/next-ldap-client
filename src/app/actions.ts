@@ -182,20 +182,20 @@ export async function createUser({name, username, password}: IRegisterInfo){
               console.error('Error al crear el archivo:', err);
                 return false;
             }
+            exec(`ldapadd -c -x -D "cn=admin,dc=ldapmss245,dc=eastus,dc=cloudapp,dc=azure,dc=com" -w '${process.env.LDAP_PASSWORD}' -f /etc/ldap/${username}.ldif`, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(
+                        `Error ejecutando el comando: ${error.message}`
+                    );
+                    return false;
+                }
+                if (stderr) {
+                    console.error(`Error en el comando: ${stderr}`);
+                    return false;
+                }
+            });
           });   
-          exec(`ldapadd -c -x -D "cn=admin,dc=ldapmss245,dc=eastus,dc=cloudapp,dc=azure,dc=com" -w '${process.env.LDAP_PASSWORD}' -f /etc/ldap/${username}.ldif
-          `, (error, stdout, stderr) => {
-              if (error) {
-                  console.error(
-                      `Error ejecutando el comando: ${error.message}`
-                  );
-                  return false;
-              }
-              if (stderr) {
-                  console.error(`Error en el comando: ${stderr}`);
-                  return false;
-              }
-          });
+         
             setCookie(username);
            
           return true;

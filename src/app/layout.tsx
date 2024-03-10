@@ -5,8 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Auth with LDAP",
-  description: "Developed by @alexcraviotto and @miguel07code",
+  title: "Autenticación con LDAP",
+  description: "Desarrollado por @alexcraviotto y @miguel07alm",
 };
 
 export default function RootLayout({
