@@ -117,7 +117,6 @@ export async function getPassword(content: string): Promise<string | null> {
         const lines = content.split('\n');
         let userPassword;
         for (const line of lines) {
-            console.log(line)
             const parts = line.split(':');
             if (parts[0].trim() === 'userPassword') {
                 userPassword = parts[1].trim();
@@ -181,7 +180,6 @@ export async function createUser({name, username, password}: IRegisterInfo){
               console.error('Error al crear el archivo:', err);
               return;
             }
-            console.log('¡El archivo se ha creado correctamente!');
           });   
             setCookie(username);
 
