@@ -1,7 +1,7 @@
 "use server";
 import ILoginInfo from '@/interfaces/ILoginInfo';
 import IRegisterInfo from '@/interfaces/IRegisterInfo';
-import { execSync } from 'child_process';
+import { exec, execSync } from 'child_process';
 import fs from 'fs'
 import { cookies } from 'next/headers';
 import path from 'path';
@@ -157,22 +157,19 @@ export async function createUser({name, username, password}: IRegisterInfo){
         username = username.trim().toLowerCase();
         const isTaken = await usernameExists(username);
         if(isTaken) return false;
-        const uuid = v4()
-        const accountInfo = `
-        dn: cn=${username},ou=Personal,dc=ldapmss245,dc=eastus,dc=cloudapp,dc=azure,dc=com
-        objectClass: top
-        objectClass: account
-        objectClass: posixAccount
-        objectClass: shadowAccount
-        cn: ${username}
-        uid: ${username}
-        displayName: ${username}
-        givenName: ${name}
-        uidNumber: ${uuid}
-        gidNumber: ${uuid}
-        homeDirectory: /home/${username}
-        userPassword: ${password}
-        loginShell: /bin/bash
+        const uuid = Math.random() * 1000000;
+        const accountInfo = `dn: cn=${username},ou=Personal,dc=ldapmss245,dc=eastus,dc=cloudapp,dc=azure,dc=com\
+objectClass: top\
+objectClass: account\
+objectClass: posixAccount\
+objectClass: shadowAccount\
+cn: ${username}\
+uid: ${username}\
+uidNumber: ${uuid}\
+gidNumber: ${uuid}\
+homeDirectory: /home/${username}\
+userPassword: ${password}\
+loginShell: /bin/bash\
         `;
         
         fs.writeFile(`/etc/ldap/${username}.ldif`, accountInfo, (err) => {
@@ -182,7 +179,19 @@ export async function createUser({name, username, password}: IRegisterInfo){
             }
           });   
             setCookie(username);
-
+            exec(`ldapadd -c -x -D "cn=admin,dc=ldapmss245,dc=eastus,dc=cloudapp,dc=azure,dc=com" -w '${process.env.LDAP_PASSWORD}' -f ${username}.ldif
+            `, (error, stdout, stderr) => {
+                if (error) {
+                    console.error(
+                        `Error ejecutando el comando: ${error.message}`
+                    );
+                    return false;
+                }
+                if (stderr) {
+                    console.error(`Error en el comando: ${stderr}`);
+                    return false;
+                }
+            });
           return true;
     } catch(error) {
         console.error(error);

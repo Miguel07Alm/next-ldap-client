@@ -1,6 +1,7 @@
 'use client';
 
-import { deleteCookies } from "@/server/actions/create-user";
+
+import { deleteCookies } from "@/app/actions";
 import { Button } from "../ui/button"
 
 export default  function Navbar() {

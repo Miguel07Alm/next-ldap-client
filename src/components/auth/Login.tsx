@@ -14,10 +14,8 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "../ui/input";
-import { login } from "@/server/actions/create-user";
 import { useToast } from "../ui/use-toast";
-import { cookies } from "next/headers";
-import { useRouter } from "next/navigation";
+import { login } from "@/app/actions";
 const formSchema = z.object({
     username: z.string().min(2, {
             message: "El usuario al menos tiene que tener 2 letras como mínimo",

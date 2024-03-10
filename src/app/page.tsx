@@ -8,10 +8,10 @@ import Header from "@/components/dashboard/Header";
 import Navbar from "@/components/dashboard/Navbar";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { isCookieValid } from "@/server/actions/create-user";
 import { TabsContent } from "@radix-ui/react-tabs";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { isCookieValid } from "./actions";
 
 
 

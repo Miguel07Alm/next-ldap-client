@@ -16,9 +16,9 @@ import {
     Button
 } from "@/components/ui/button";
 import { Input } from "../ui/input";
-import { createUser } from "@/server/actions/create-user";
 import { useToast } from "../ui/use-toast";
 import { useRouter } from "next/navigation";
+import { createUser } from "@/app/actions";
 const formSchema = z.object({
     username: z
         .string()

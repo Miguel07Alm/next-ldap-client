@@ -12,7 +12,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { useState } from "react";
 import { toast, useToast } from "../ui/use-toast";
-import { changePassword } from "@/server/actions/create-user";
+import { changePassword } from "@/app/actions";
 import IHeader from "@/interfaces/IHeader";
 export default function ChangePasswordModal({username} : IHeader) {
     const [newPassword, setNewPassword] = useState("");
