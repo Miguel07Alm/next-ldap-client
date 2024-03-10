@@ -83,7 +83,7 @@ export default function ChangePasswordModal({username} : IHeader) {
                             handleSubmit()
                             }}
                     >
-                        Save changes
+                        Guardar cambios
                     </Button>
                 </DialogFooter>
             </DialogContent>
