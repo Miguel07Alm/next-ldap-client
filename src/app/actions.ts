@@ -7,6 +7,7 @@ import { cookies } from 'next/headers';
 import path from 'path';
 import {v4} from 'uuid';
 import crypto from 'crypto';
+import { stderr } from 'process';
 
 export async function readUsers() {
     try {
@@ -103,6 +104,19 @@ export async function changePassword(username: string, newPassword: string){
 
         const updatedContent = content.replace(`userPassword: ${userPassword}`, `userPassword: ${newPassword}`);
         await fs.promises.writeFile(`/etc/ldap/${username}.ldif`, updatedContent, 'utf-8');
+        const ldapCommand = `ldappasswd -x -D "cn=admin,dc=ldapmss245,dc=eastus,dc=cloudapp,dc=azure,dc=com" -w "${process.env.LDAP_PASSWORD}" -S "cn=${username},ou=Personal,dc=ldapmss245,dc=eastus,dc=cloudapp,dc=azure,dc=com" -s "${newPassword}"`;
+        exec(ldapCommand, (error, stdout, stderr) => {
+            if (error) {
+                console.error(
+                    `Error ejecutando el comando: ${error.message}`
+                );
+                return false;
+            }
+            if (stderr) {
+                console.error(`Error en el comando: ${stderr}`);
+                return false;
+            }
+        })
 
         return true;
     } catch (error) {
