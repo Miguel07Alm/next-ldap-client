@@ -7,7 +7,7 @@ This project is a web application developed with Next.js that provides an interf
 1. Clone this repository to your local machine:
 
 ```bash
-git clone https://github.com/Miguel07Alm/next-ldap-clien)https://github.com/Miguel07Alm/next-ldap-client
+git clone https://github.com/Miguel07Alm/next-ldap-client)https://github.com/Miguel07Alm/next-ldap-client
 ```
 2. Give permissions to /etc/ldap
 
