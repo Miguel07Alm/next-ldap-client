@@ -104,7 +104,14 @@ export async function changePassword(username: string, newPassword: string){
 
         const updatedContent = content.replace(`userPassword: ${userPassword}`, `userPassword: ${newPassword}`);
         await fs.promises.writeFile(`/etc/ldap/${username}.ldif`, updatedContent, 'utf-8');
-        const ldapCommand = `ldappasswd -x -D "cn=admin,dc=ldapmss245,dc=eastus,dc=cloudapp,dc=azure,dc=com" -w "${process.env.LDAP_PASSWORD}" -S "cn=${username},ou=Personal,dc=ldapmss245,dc=eastus,dc=cloudapp,dc=azure,dc=com" -s "${newPassword}"`;
+      	  const ldapCommand = `
+ldapmodify -x -D "cn=admin,dc=ldapmss245,dc=eastus,dc=cloudapp,dc=azure,dc=com" -w "${process.env.LDAP_PASSWORD}" <<EOF
+dn: cn=${username},ou=Personal,dc=ldapmss245,dc=eastus,dc=cloudapp,dc=azure,dc=com
+changetype: modify
+replace: userPassword
+userPassword: ${newPassword}
+EOF
+        `;
         exec(ldapCommand, (error, stdout, stderr) => {
             if (error) {
                 console.error(
